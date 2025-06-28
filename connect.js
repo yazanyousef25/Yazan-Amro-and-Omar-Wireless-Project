@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const inputData = document.getElementById('inputData').value;
     
-    fetch('https://your-backend-name.onrender.com/api/calculate', {
+    fetch('https://wireless-backend-g03k.onrender.com', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
