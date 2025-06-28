@@ -6,12 +6,12 @@
     <title>AI-Powered Wireless Network Designer</title>
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+    <link href="https://cdn.tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
     <style>
         .hidden { display: none; }
         .ai-explanation {
-            background-color: #f0fff4; 
-            border-left: 4px solid #38a169; 
+            background-color: #f0fff4; /* Light green background */
+            border-left: 4px solid #38a169; /* Tailwind green-600 */
             padding: 1rem;
             margin-top: 1.5rem;
             text-align: left;
@@ -23,7 +23,7 @@
             font-weight: bold;
             margin-top: 1rem;
             margin-bottom: 0.5rem;
-            border-bottom: 1px solid #9ae6b4; 
+            border-bottom: 1px solid #9ae6b4; /* Lighter green border */
             padding-bottom: 0.25rem;
         }
         .ai-explanation h1 { font-size: 1.25rem; }
@@ -196,12 +196,18 @@
 
 <!-- JAVASCRIPT SECTION -->
 <!-- NOTE: The following two script files must be present in the same directory as this HTML file -->
-<script src="connect.js"></script>
 <script src="BERvsEbNo.js"></script>
 <script src="ErlangB.js"></script>
 <script>
-    
+    // Store inputs and outputs globally for the AI explanation functions
     let lastCalculation = {};
+
+    // --- FIX: Dynamic API URL for Local and Deployed Environments ---
+    // This will use 'localhost' for local development and your Render URL when deployed.
+    // IMPORTANT: Replace 'your-backend-name.onrender.com' with your actual backend service URL from Render.
+    const API_BASE_URL = window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost'
+        ? 'http://localhost:3000'
+        : 'https://your-backend-name.onrender.com';
 
     async function getAIExplanation(scenario, inputs, outputs, explanationDivId) {
         const explanationDiv = document.getElementById(explanationDivId);
@@ -209,7 +215,8 @@
         explanationDiv.innerHTML = '<p>🤖 Thinking... Please wait. The AI is generating a detailed explanation.</p>';
 
         try {
-            const response = await fetch('http://localhost:3000/api/explain', {
+            // Use the dynamic API_BASE_URL to contact the backend
+            const response = await fetch(`${API_BASE_URL}/api/explain`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ scenario, inputs, outputs }),
@@ -225,12 +232,11 @@
 
         } catch (error) {
             console.error('Error getting AI explanation:', error);
-            
-            explanationDiv.innerHTML = `<p style="color: red; font-weight: bold;">Error: Could not connect to the AI assistant.</p><p>Please ensure the backend server is running ('npm start' in the terminal). Details: ${error.message}</p>`;
+            explanationDiv.innerHTML = `<p style="color: red; font-weight: bold;">Error: Could not connect to the AI assistant.</p><p>Please ensure your deployed backend is live and the URL in the code is correct. Details: ${error.message}</p>`;
         }
     }
     
-    
+    // --- Navigation Logic ---
     const calculators = {
         calc1: document.getElementById('calculator1'),
         calc2: document.getElementById('calculator2'),
@@ -285,11 +291,11 @@
     
     showCalculator('calc1');
 
-        function formatResult(label, value, unit) {
+    function formatResult(label, value, unit) {
         return `<div class="font-semibold">${label}:</div><div class="text-right">${value} ${unit}</div>`;
     }
 
-    
+    // --- Calculator 1 Logic ---
     function calculate1() {
         const inputs = {
             bandwidthHz: parseFloat(document.getElementById("inputBandwidth").value),
@@ -334,7 +340,7 @@
     }
     function explain1() { getAIExplanation(lastCalculation.scenario, lastCalculation.inputs, lastCalculation.outputs, 'explanation1'); }
 
-    
+    // --- Calculator 2 Logic (Results Reordered) ---
     function calculate2() {
         const inputs = {
             resourceBlockBandwidthKHz: parseFloat(document.getElementById("inputResourceBlockBandwidth").value),
@@ -379,7 +385,7 @@
     }
     function explain2() { getAIExplanation(lastCalculation.scenario, lastCalculation.inputs, lastCalculation.outputs, 'explanation2'); }
 
-    
+    // --- Calculator 3 Logic (Result order is already logical) ---
     function calculate3() {
         const inputs = {
             pathLossDb: parseFloat(document.getElementById("inputPathLoss").value),
@@ -424,7 +430,7 @@
     }
     function explain3() { getAIExplanation(lastCalculation.scenario, lastCalculation.inputs, lastCalculation.outputs, 'explanation3'); }
 
-    
+    // --- Calculator 4 Logic (Results Reordered) ---
     function calculate4() {
         const inputs = {
             totalAreaKm2: parseFloat(document.getElementById("inputCityArea").value),
@@ -470,12 +476,12 @@
     }
     function explain4() { getAIExplanation(lastCalculation.scenario, lastCalculation.inputs, lastCalculation.outputs, 'explanation4'); }
 
-    
+    // --- BER Plotting Script ---
     function plotBer() {
         const eb_no_db = Array.from({ length: 180 }, (v, k) => k * 0.1);
         const eb_no = eb_no_db.map((x) => 10 ** (x / 10));
         
-        
+        // Ensure the helper functions from BERvsEbNo.js are loaded
         if (typeof ber_bpsk === 'undefined' || typeof ber_psk === 'undefined') {
             console.error("BER helper functions not loaded. Make sure BERvsEbNo.js is correct and available.");
             return;
