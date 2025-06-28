@@ -6,7 +6,7 @@
     <title>AI-Powered Wireless Network Designer</title>
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    <link href="https://cdn.tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
     <style>
         .hidden { display: none; }
         .ai-explanation {
@@ -202,21 +202,13 @@
     // Store inputs and outputs globally for the AI explanation functions
     let lastCalculation = {};
 
-    // --- FIX: Dynamic API URL for Local and Deployed Environments ---
-    // This will use 'localhost' for local development and your Render URL when deployed.
-    // IMPORTANT: Replace 'your-backend-name.onrender.com' with your actual backend service URL from Render.
-    const API_BASE_URL = window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost'
-        ? 'http://localhost:3000'
-        : 'https://your-backend-name.onrender.com';
-
     async function getAIExplanation(scenario, inputs, outputs, explanationDivId) {
         const explanationDiv = document.getElementById(explanationDivId);
         explanationDiv.classList.remove('hidden');
         explanationDiv.innerHTML = '<p>🤖 Thinking... Please wait. The AI is generating a detailed explanation.</p>';
 
         try {
-            // Use the dynamic API_BASE_URL to contact the backend
-            const response = await fetch(`${API_BASE_URL}/api/explain`, {
+            const response = await fetch('http://localhost:3000/api/explain', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ scenario, inputs, outputs }),
@@ -232,7 +224,8 @@
 
         } catch (error) {
             console.error('Error getting AI explanation:', error);
-            explanationDiv.innerHTML = `<p style="color: red; font-weight: bold;">Error: Could not connect to the AI assistant.</p><p>Please ensure your deployed backend is live and the URL in the code is correct. Details: ${error.message}</p>`;
+            // --- FIX 1: Corrected the error message to be a valid string ---
+            explanationDiv.innerHTML = `<p style="color: red; font-weight: bold;">Error: Could not connect to the AI assistant.</p><p>Please ensure the backend server is running ('npm start' in the terminal). Details: ${error.message}</p>`;
         }
     }
     
@@ -291,6 +284,7 @@
     
     showCalculator('calc1');
 
+    // --- FIX 2: Corrected the function to return a valid template literal string ---
     function formatResult(label, value, unit) {
         return `<div class="font-semibold">${label}:</div><div class="text-right">${value} ${unit}</div>`;
     }
