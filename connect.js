@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const inputData = document.getElementById('inputData').value;
     
-    fetch('https://wireless-backend-3xw9.onrender.com', {
+    fetch('https://wireless-backend-wvva.onrender.com', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
